@@ -6,18 +6,27 @@ import Html exposing (Html, button, div)
 import Html.Events exposing (onClick)
 import List exposing (..)
 import Debug exposing (..)
+import Random
 
 main =
-    Html.beginnerProgram { model = model, view = view, update = update }
+    Html.program
+        { init = init
+        , view = view
+        , update = update
+        , subscriptions = subscriptions
+        }
 
 -- TODO: fix this compile error
-type alias Model = List Float
+type alias Tri = { base : Float }
+type alias Model = List Tri
+
 type Msg = Matryoshka
 
-model : Model
-model = [800]
+init : (Model, Cmd Msg)
+init =
+  ([Tri 800], Cmd.none)
 
-update : Msg -> Model -> List Float
+update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
         Matryoshka ->
@@ -26,25 +35,30 @@ update msg model =
             in
                 case lastElement of
                     Nothing ->
-                        [800]
-                    Just val ->
-                        val / 2 :: model
+                        ([Tri 800], Cmd.none)
+                    Just tri ->
+                        (
+                        ((Tri (tri.base / 2)) :: model), Cmd.none
+                        )
 
-makeTriangle : Float -> Collage Msg
-makeTriangle base =
+subscriptions : Model -> Sub Msg
+subscriptions model =
+  Sub.none
+
+makeTriangle : Tri -> Collage Msg
+makeTriangle tri =
      let
          gap = spacer 50 50
      in
-         triangle base
+         triangle tri.base
                   -- todo: generate random color
                   |> filled (uniform (rgb 51 255 255))
 
 renderTriangle : Model -> Html Msg
-renderTriangle coll =
+renderTriangle model =
      let
-         triangles = map makeTriangle coll
+         triangles = List.map makeTriangle model
      in
-         log (toString coll)
          group triangles
          |> svg
 
