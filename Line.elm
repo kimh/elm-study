@@ -17,29 +17,35 @@ main =
         }
 
 -- TODO: fix this compile error
-type alias Tri = { base : Float }
+type alias Tri =
+    {base : Float,
+     color : Color
+    }
+
 type alias Model = List Tri
 
-type Msg = Matryoshka
+type Msg =
+    Matryoshka
+    | RandCol Int
 
 init : (Model, Cmd Msg)
 init =
-  ([Tri 800], Cmd.none)
+  ([Tri 800 (rgb 50 255 255)], Cmd.none)
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
         Matryoshka ->
+            (model, Random.generate RandCol (Random.int 1 255))
+        RandCol rand ->
             let
                 lastElement = head model
             in
                 case lastElement of
                     Nothing ->
-                        ([Tri 800], Cmd.none)
+                        (model, Cmd.none)
                     Just tri ->
-                        (
-                        ((Tri (tri.base / 2)) :: model), Cmd.none
-                        )
+                        (((Tri (tri.base / 2) (rgb rand 255 255)) :: model), Cmd.none)
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
@@ -52,7 +58,7 @@ makeTriangle tri =
      in
          triangle tri.base
                   -- todo: generate random color
-                  |> filled (uniform (rgb 51 255 255))
+                  |> filled (uniform tri.color)
 
 renderTriangle : Model -> Html Msg
 renderTriangle model =
