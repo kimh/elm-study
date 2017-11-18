@@ -2,34 +2,37 @@ import Collage exposing (..)
 import Collage.Layout exposing (..)
 import Collage.Render exposing (svg)
 import Color exposing (..)
-import Html exposing (Html)
+import Html exposing (Html, button, div)
+import Html.Events exposing (onClick)
 
-main : Html msg
 main =
-    Html.Matryoshka { model = model, view = view, update = update }
+    Html.beginnerProgram { model = model, view = view, update = update }
 
 -- TODO: fix this compile error
-type alias Model = Html msg
-
-model : Model
-model =
-    let
-        gap = spacer 50 50
-        innerTri = triangle 500
-                 |> filled (uniform Color.red)
-    in
-        group [outerTri]
-        |> svg
-
+type alias Model = Float
 type Msg = Matryoshka
 
-update : Msg -> Model
+model : Model
+model = 800
+
+
+update : Msg -> Model -> Float
 update msg model =
     case msg of
         Matryoshka ->
-            model
+            model / 2
+
+renderTriangle : Model -> Html Msg
+renderTriangle base =
+     let
+         gap = spacer 50 50
+         outerTri = triangle base
+                  |> filled (uniform Color.red)
+     in
+         group [outerTri]
+         |> svg
 
 view : Model -> Html Msg
 view model =
     div []
-        [ button [ onClick Matryoshka ] [ text "-" ] ]
+        [ button [ onClick Matryoshka ] [ renderTriangle model ] ]
