@@ -34,5 +34,4 @@ renderTriangle base =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ button [ onClick Matryoshka ] [ renderTriangle model ] ]
+    div [ onClick Matryoshka ] [ renderTriangle model ]
