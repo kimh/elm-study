@@ -26,7 +26,7 @@ type alias Model = List Tri
 
 type Msg =
     Matryoshka
-    | RandCol Int
+    | RandCol (List Int)
 
 init : (Model, Cmd Msg)
 init =
@@ -36,16 +36,19 @@ update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
         Matryoshka ->
-            (model, Random.generate RandCol (Random.int 1 255))
+            (model, Random.generate RandCol (Random.list 3 (Random.int 1 255)))
         RandCol rand ->
             let
                 lastElement = head model
+                first = Maybe.withDefault 255 (head rand)
+                second =  Maybe.withDefault 255 (head (List.drop 1 rand))
+                third = Maybe.withDefault 255 (head (List.drop 2 rand))
             in
                 case lastElement of
                     Nothing ->
                         (model, Cmd.none)
                     Just tri ->
-                        (((Tri (tri.base / 2) (rgb rand 255 255)) :: model), Cmd.none)
+                        (((Tri (tri.base / 2) (rgb first second third)) :: model), Cmd.none)
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
