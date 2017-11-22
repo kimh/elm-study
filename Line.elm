@@ -1,4 +1,4 @@
-import Collage exposing (..)
+import Collage exposing (ngon, filled, uniform, group, rotate, Collage)
 import Collage.Layout exposing (..)
 import Collage.Render exposing (svg)
 import Color exposing (..)
@@ -18,20 +18,32 @@ main =
 
 type alias Tri =
     {base : Float,
-     color : Color
+     color : Color,
+     degree: Float
     }
 
 type alias Model = List Tri
 
 type Msg =
     Matryoshka
+    | Matryoshka2
     | RandCol (List Int)
 
 init : (Model, Cmd Msg)
 init =
-  ([Tri 800 (rgb 50 255 255)], Cmd.none)
+  ([Tri 500 (rgb 50 255 255) 0], Cmd.none)
 
--- TODO: write recursive version of applying list of colors
+
+triangle: Float -> Collage.Shape
+triangle base =
+    ngon 3 base
+
+getDegree degree =
+    case degree of
+        0 -> 180
+        180 -> 0
+        _ -> 0
+
 makeColor colors =
     case colors of
         [ r, g, b ] ->
@@ -44,12 +56,16 @@ update msg model =
     case msg of
         Matryoshka ->
             (model, Random.generate RandCol (Random.list 3 (Random.int 1 255)))
+
+        Matryoshka2 ->
+            (model, Random.generate RandCol (Random.list 3 (Random.int 1 255)))
+
         RandCol rand ->
             case (head model) of
                 Nothing ->
                     (model, Cmd.none)
                 Just tri ->
-                    (((Tri (tri.base / 2) (makeColor rand)) :: model), Cmd.none)
+                    (((Tri (tri.base / 2) (makeColor rand) (getDegree tri.degree)) :: model), Cmd.none)
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
@@ -63,6 +79,7 @@ makeTriangle tri =
          triangle tri.base
                   -- todo: generate random color
                   |> filled (uniform tri.color)
+                  |> rotate (degrees tri.degree)
 
 renderTriangle : Model -> Html Msg
 renderTriangle model =
