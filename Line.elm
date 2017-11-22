@@ -16,7 +16,6 @@ main =
         , subscriptions = subscriptions
         }
 
--- TODO: fix this compile error
 type alias Tri =
     {base : Float,
      color : Color
@@ -32,23 +31,25 @@ init : (Model, Cmd Msg)
 init =
   ([Tri 800 (rgb 50 255 255)], Cmd.none)
 
+-- TODO: write recursive version of applying list of colors
+makeColor colors =
+    case colors of
+        [ r, g, b ] ->
+            Color.rgb r g b
+        _ ->
+            Color.black
+
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
         Matryoshka ->
             (model, Random.generate RandCol (Random.list 3 (Random.int 1 255)))
         RandCol rand ->
-            let
-                lastElement = head model
-                first = Maybe.withDefault 255 (head rand)
-                second =  Maybe.withDefault 255 (head (List.drop 1 rand))
-                third = Maybe.withDefault 255 (head (List.drop 2 rand))
-            in
-                case lastElement of
-                    Nothing ->
-                        (model, Cmd.none)
-                    Just tri ->
-                        (((Tri (tri.base / 2) (rgb first second third)) :: model), Cmd.none)
+            case (head model) of
+                Nothing ->
+                    (model, Cmd.none)
+                Just tri ->
+                    (((Tri (tri.base / 2) (makeColor rand)) :: model), Cmd.none)
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
