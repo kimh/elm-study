@@ -9,37 +9,51 @@ import Debug exposing (..)
 import Random
 
 main =
-  Html.beginnerProgram { model = model, view = view, update = update }
+  Html.program { init = init, view = view, update = update, subscriptions = subscriptions }
 
 type alias Model =
     {step : Int,
-     side : Float}
+     side : Float,
+     color : Color}
 
-model =
-    Model 0 1200
+init : (Model, Cmd Msg)
+init =
+   ((Model 0 1200 Color.blue), Cmd.none)
 
 type Msg =
     Sierpinski
+    | RandCol (List Int)
 
-update : Msg -> Model -> Model
+makeColor colors =
+    case colors of
+        [ r, g, b ] ->
+            Color.rgb r g b
+        _ ->
+            Color.black
+
+update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
         Sierpinski ->
-            Model (model.step + 1) (model.side)
+           (model, Random.generate RandCol (Random.list 3 (Random.int 1 255)))
+
+        RandCol rand ->
+           (Model (model.step + 1) (model.side) (makeColor rand), Cmd.none)
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+  Sub.none
 
 sierpinski : Model -> Collage Msg
 sierpinski model =
     case model.step of
         0 ->
             triangle model.side
-                |> filled (uniform Color.blue)
+                |> filled (uniform model.color)
         _ ->
             let
-                nstep = model.step - 1
-                nside = model.side / 2
-                nmodel = Model nstep nside
                 smaller =
-                    Model (model.step - 1) (model.side / 2)
+                    Model (model.step - 1) (model.side / 2) model.color
                         |> sierpinski
             in
             vertical
