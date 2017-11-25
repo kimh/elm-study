@@ -14,15 +14,15 @@ main =
 type alias Model =
     {step : Int,
      side : Float,
-     color : Color}
+     seed : Int}
 
 init : (Model, Cmd Msg)
 init =
-   ((Model 0 1200 Color.blue), Cmd.none)
+   ((Model 0 1200 1), Cmd.none)
 
 type Msg =
     Sierpinski
-    | RandCol (List Int)
+    | NewSeed Int
 
 makeColor colors =
     case colors of
@@ -35,32 +35,37 @@ update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
         Sierpinski ->
-           (model, Random.generate RandCol (Random.list 3 (Random.int 1 255)))
+           (model, Random.generate NewSeed (Random.int 1 255))
 
-        RandCol rand ->
-           (Model (model.step + 1) (model.side) (makeColor rand), Cmd.none)
+        NewSeed seed ->
+           (Model (model.step + 1) (model.side) seed, Cmd.none)
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
   Sub.none
 
-sierpinski : Model -> Collage Msg
-sierpinski model =
+sierpinski : Model -> Color -> Collage Msg
+sierpinski model color =
     case model.step of
         0 ->
             triangle model.side
-                |> filled (uniform model.color)
+                |> filled (uniform color)
         _ ->
             let
+                seed0 =  Random.initialSeed model.seed
+                (rand0, seed1) = Random.step (Random.list 3 (Random.int 0 255)) seed0
+                (rand1, seed2) = Random.step (Random.list 3 (Random.int 0 255)) seed1
+                (rand2, seed3) = Random.step (Random.list 3 (Random.int 0 255)) seed2
+
                 smaller =
-                    Model (model.step - 1) (model.side / 2) model.color
-                        |> sierpinski
+                    Model (model.step - 1) (model.side / 2) (Tuple.first (Random.step (Random.int 0 255) seed3))
+
             in
             vertical
-                [ smaller
-                , horizontal [ smaller, smaller ] |> center
+                [ (sierpinski smaller (makeColor rand0))
+                , horizontal [ (sierpinski smaller (makeColor rand1)), (sierpinski smaller (makeColor rand2)) ] |> center
                 ]
 
 view : Model -> Html Msg
 view model =
-    div [ onClick Sierpinski ] [(sierpinski model) |>svg]
+    div [ onClick Sierpinski ] [(sierpinski model (Color.rgb 1 1 1)) |>svg]
