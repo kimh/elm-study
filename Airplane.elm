@@ -24,6 +24,7 @@ import Collage exposing (..)
 import Collage.Layout exposing (..)
 import Collage.Render exposing (svg)
 import Time exposing (Time)
+import Mouse
 import AnimationFrame
 import Html exposing (Html, button, div, img)
 import Html.Events exposing (onClick)
@@ -42,6 +43,7 @@ model0 =
 
 type Msg
     = Tick Time
+    | MouseMsg Mouse.Position
 
 update : Msg -> Model -> Model
 update msg model =
@@ -49,21 +51,24 @@ update msg model =
         Tick dt ->
             let
                 clock = model.clock + dt
-                moveDone =
-                    isDone clock model.x && isDone clock model.y
-
-                newX = if log "done" moveDone then
-                    retarget clock 500 model.x
-                else
-                    model.x
-
-                newY = if moveDone then
-                    retarget clock 0 model.y
-                else
-                    model.y
-
             in
-                { model | clock = clock, x = newX, y = newY }
+                { model | clock = clock }
+
+        MouseMsg position ->
+           let
+               -- We need this so that plan's center moves to the new postion
+               adjustment = -150
+               posx = position.x
+                      |> toFloat
+                      |> (+) adjustment
+               posy = position.y
+                      |> toFloat
+                      |> (+) adjustment
+                      |> (*) -1
+               newX = retarget model.clock posx model.x
+               newY = retarget model.clock posy model.y
+           in
+               {model | x = newX, y = newY }
 
 view : Model -> Html Msg
 view { x, y, clock } =
@@ -87,7 +92,8 @@ subs : Sub Msg
 subs =
     Sub.batch
         [
-        AnimationFrame.diffs Tick
+        AnimationFrame.diffs Tick,
+        Mouse.clicks MouseMsg
         ]
 
 main =
