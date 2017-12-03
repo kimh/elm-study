@@ -49,8 +49,21 @@ update msg model =
         Tick dt ->
             let
                 clock = model.clock + dt
+                moveDone =
+                    isDone clock model.x && isDone clock model.y
+
+                newX = if log "done" moveDone then
+                    retarget clock 500 model.x
+                else
+                    model.x
+
+                newY = if moveDone then
+                    retarget clock 0 model.y
+                else
+                    model.y
+
             in
-                { model | clock = clock }
+                { model | clock = clock, x = newX, y = newY }
 
 view : Model -> Html Msg
 view { x, y, clock } =
@@ -61,7 +74,6 @@ view { x, y, clock } =
 
         plane = image (300, 300) "images/airplane.jpg"
         circle =
-            --Collage.circle 100 |> Collage.filled (uniform yellow) |> Collage.shift pos -- TODO: why new pos is not rendered??
             plane |> Collage.shift pos
     in
         group [
