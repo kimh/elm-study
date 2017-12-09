@@ -1,4 +1,4 @@
-module Main exposing (..)
+port module Main exposing (..)
 
 {- This example shows a looping animation using only the undo method, not retarget. The step function is a little more
    repetitive than I'd like, suggesting a loop function. Without a major overhaul, the best implementation would be

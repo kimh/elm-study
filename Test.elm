@@ -1,20 +1,17 @@
-import Color exposing (black, yellow)
-import Collage exposing (..)
-import Collage.Layout exposing (..)
-import Collage.Render exposing (svg)
-import Time exposing (Time)
-import AnimationFrame
+port module Test exposing (..)
 import Html exposing (Html, button, div, audio)
-import Html.Attributes exposing (src, autoplay)
 import Html.Events exposing (onClick)
-import Animation exposing (..)
+import Html.Attributes exposing (src, autoplay)
 import Debug exposing (log)
 
 main =
   Html.program { init = init, view = view, update = update, subscriptions = subscriptions }
 
+port play : Float -> Cmd msg
+
 type alias Model = Int
-type Msg = NoOp
+type Msg =
+    Play
 
 init : (Model, Cmd Msg)
 init =
@@ -22,14 +19,15 @@ init =
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
-    (model, Cmd.none)
+    case msg of
+        Play ->
+            (model, play 1)
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Sub.none
+  Sub.batch []
 
 view : Model -> Html Msg
 view model =
-    -- TODO: how can I play sound when I click?
     div []
-        [audio [(src "audios/airliner-pass1.mp3"), (autoplay True)] []]
+        [button [ onClick Play] []]
