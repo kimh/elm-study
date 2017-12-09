@@ -21,6 +21,7 @@ port module Main exposing (..)
 
 import Color exposing (yellow)
 import Collage exposing (..)
+import Collage.Events exposing (onClick)
 import Collage.Layout exposing (..)
 import Collage.Render exposing (svg)
 import Time exposing (Time)
@@ -35,6 +36,8 @@ import Debug exposing (log)
 type alias Model =
     { x : Animation, y : Animation, clock : Time }
 
+port play : Float -> Cmd msg
+
 model0 =
     Model
         (animation 0 |> from 500 |> to 0 |> duration Time.second)
@@ -44,15 +47,16 @@ model0 =
 type Msg
     = Tick Time
     | MouseMsg Mouse.Position
+    | Play
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
         Tick dt ->
             let
                 clock = model.clock + dt
             in
-                { model | clock = clock }
+                ({ model | clock = clock }, Cmd.none)
 
         MouseMsg position ->
            let
@@ -68,7 +72,9 @@ update msg model =
                newX = retarget model.clock posx model.x
                newY = retarget model.clock posy model.y
            in
-               {model | x = newX, y = newY }
+               ({model | x = newX, y = newY }, Cmd.none)
+        Play ->
+            (model, play 1)
 
 view : Model -> Html Msg
 view { x, y, clock } =
@@ -86,6 +92,7 @@ view { x, y, clock } =
              circle
              ]
             |> Collage.Layout.debug
+            |> Collage.Events.onClick Play
             |> svg
 
 subs : Sub Msg
@@ -99,7 +106,7 @@ subs =
 main =
     Html.program
         { init = ( model0, Cmd.none )
-        , update = (\msg model -> ( update msg model, Cmd.none ))
+        , update = update
         , subscriptions = always subs
         , view = view
         }
