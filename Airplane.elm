@@ -32,6 +32,7 @@ import Html.Events exposing (onClick)
 import Html.Attributes exposing (src)
 import Animation exposing (..)
 import Debug exposing (log)
+import Task
 
 type alias Model =
     { x : Animation, y : Animation, clock : Time }
@@ -48,6 +49,11 @@ type Msg
     = Tick Time
     | MouseMsg Mouse.Position
     | Play
+
+send : msg -> Cmd msg
+send msg =
+  Task.succeed msg
+  |> Task.perform identity
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -72,7 +78,7 @@ update msg model =
                newX = retarget model.clock posx model.x
                newY = retarget model.clock posy model.y
            in
-               ({model | x = newX, y = newY }, Cmd.none)
+               ({model | x = newX, y = newY }, send Play)
         Play ->
             (model, play 1)
 
@@ -83,7 +89,7 @@ view { x, y, clock } =
         pos =
             ( animate clock x, animate clock y )
 
-        plane = image (300, 300) "images/airplane.jpg"
+        plane = image (500, 500) "images/airplane2.svg"
         circle =
             plane |> Collage.shift pos
     in
@@ -91,8 +97,7 @@ view { x, y, clock } =
              spacer 300 300,
              circle
              ]
-            |> Collage.Layout.debug
-            |> Collage.Events.onClick Play
+            -- |> Collage.Layout.debug
             |> svg
 
 subs : Sub Msg

@@ -12404,63 +12404,41 @@ var _timjs$elm_collage$Collage_Render$svgBox = F2(
 				collage));
 	});
 
+var _user$project$Main$view = function (_p0) {
+	var _p1 = _p0;
+	var _p2 = _p1.clock;
+	var plane = A2(
+		_timjs$elm_collage$Collage$image,
+		{ctor: '_Tuple2', _0: 500, _1: 500},
+		'images/airplane2.svg');
+	var pos = {
+		ctor: '_Tuple2',
+		_0: A2(_mgold$elm_animation$Animation$animate, _p2, _p1.x),
+		_1: A2(_mgold$elm_animation$Animation$animate, _p2, _p1.y)
+	};
+	var circle = A2(_timjs$elm_collage$Collage$shift, pos, plane);
+	return _timjs$elm_collage$Collage_Render$svg(
+		_timjs$elm_collage$Collage$group(
+			{
+				ctor: '::',
+				_0: A2(_timjs$elm_collage$Collage_Layout$spacer, 300, 300),
+				_1: {
+					ctor: '::',
+					_0: circle,
+					_1: {ctor: '[]'}
+				}
+			}));
+};
+var _user$project$Main$send = function (msg) {
+	return A2(
+		_elm_lang$core$Task$perform,
+		_elm_lang$core$Basics$identity,
+		_elm_lang$core$Task$succeed(msg));
+};
 var _user$project$Main$play = _elm_lang$core$Native_Platform.outgoingPort(
 	'play',
 	function (v) {
 		return v;
-	});
-var _user$project$Main$update = F2(
-	function (msg, model) {
-		var _p0 = msg;
-		switch (_p0.ctor) {
-			case 'Tick':
-				var clock = model.clock + _p0._0;
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{clock: clock}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			case 'MouseMsg':
-				var _p1 = _p0._0;
-				var adjustment = -150;
-				var posx = A2(
-					F2(
-						function (x, y) {
-							return x + y;
-						}),
-					adjustment,
-					_elm_lang$core$Basics$toFloat(_p1.x));
-				var newX = A3(_mgold$elm_animation$Animation$retarget, model.clock, posx, model.x);
-				var posy = A2(
-					F2(
-						function (x, y) {
-							return x * y;
-						}),
-					-1,
-					A2(
-						F2(
-							function (x, y) {
-								return x + y;
-							}),
-						adjustment,
-						_elm_lang$core$Basics$toFloat(_p1.y)));
-				var newY = A3(_mgold$elm_animation$Animation$retarget, model.clock, posy, model.y);
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{x: newX, y: newY}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			default:
-				return {
-					ctor: '_Tuple2',
-					_0: model,
-					_1: _user$project$Main$play(1)
-				};
-		}
 	});
 var _user$project$Main$Model = F3(
 	function (a, b, c) {
@@ -12490,35 +12468,59 @@ var _user$project$Main$model0 = A3(
 				_mgold$elm_animation$Animation$animation(0)))),
 	0);
 var _user$project$Main$Play = {ctor: 'Play'};
-var _user$project$Main$view = function (_p2) {
-	var _p3 = _p2;
-	var _p4 = _p3.clock;
-	var plane = A2(
-		_timjs$elm_collage$Collage$image,
-		{ctor: '_Tuple2', _0: 300, _1: 300},
-		'images/airplane.jpg');
-	var pos = {
-		ctor: '_Tuple2',
-		_0: A2(_mgold$elm_animation$Animation$animate, _p4, _p3.x),
-		_1: A2(_mgold$elm_animation$Animation$animate, _p4, _p3.y)
-	};
-	var circle = A2(_timjs$elm_collage$Collage$shift, pos, plane);
-	return _timjs$elm_collage$Collage_Render$svg(
-		A2(
-			_timjs$elm_collage$Collage_Events$onClick,
-			_user$project$Main$Play,
-			_timjs$elm_collage$Collage_Layout$debug(
-				_timjs$elm_collage$Collage$group(
-					{
-						ctor: '::',
-						_0: A2(_timjs$elm_collage$Collage_Layout$spacer, 300, 300),
-						_1: {
-							ctor: '::',
-							_0: circle,
-							_1: {ctor: '[]'}
-						}
-					}))));
-};
+var _user$project$Main$update = F2(
+	function (msg, model) {
+		var _p3 = msg;
+		switch (_p3.ctor) {
+			case 'Tick':
+				var clock = model.clock + _p3._0;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{clock: clock}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'MouseMsg':
+				var _p4 = _p3._0;
+				var adjustment = -150;
+				var posx = A2(
+					F2(
+						function (x, y) {
+							return x + y;
+						}),
+					adjustment,
+					_elm_lang$core$Basics$toFloat(_p4.x));
+				var newX = A3(_mgold$elm_animation$Animation$retarget, model.clock, posx, model.x);
+				var posy = A2(
+					F2(
+						function (x, y) {
+							return x * y;
+						}),
+					-1,
+					A2(
+						F2(
+							function (x, y) {
+								return x + y;
+							}),
+						adjustment,
+						_elm_lang$core$Basics$toFloat(_p4.y)));
+				var newY = A3(_mgold$elm_animation$Animation$retarget, model.clock, posy, model.y);
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{x: newX, y: newY}),
+					_1: _user$project$Main$send(_user$project$Main$Play)
+				};
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: _user$project$Main$play(1)
+				};
+		}
+	});
 var _user$project$Main$MouseMsg = function (a) {
 	return {ctor: 'MouseMsg', _0: a};
 };
