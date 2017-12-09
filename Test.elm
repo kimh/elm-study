@@ -4,7 +4,8 @@ import Collage.Layout exposing (..)
 import Collage.Render exposing (svg)
 import Time exposing (Time)
 import AnimationFrame
-import Html exposing (Html, button, div)
+import Html exposing (Html, button, div, audio)
+import Html.Attributes exposing (src, autoplay)
 import Html.Events exposing (onClick)
 import Animation exposing (..)
 import Debug exposing (log)
@@ -29,12 +30,6 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    --Collage.Layout.debug (Collage.circle  300 |> Collage.filled (uniform yellow) |> shift (100,-100)) |> svg
-    group [
-    spacer 0 0,
-    Collage.triangle 10 |> filled (uniform black) |> shift (450, -450)
-    --Collage.triangle 10 |> filled (uniform yellow),
-    --Collage.triangle 10 |> filled (uniform black) |> shift (450, 0)
-        ]
-        |> Collage.Layout.debug
-        |> svg
+    -- TODO: how can I play sound when I click?
+    div []
+        [audio [(src "audios/airliner-pass1.mp3"), (autoplay True)] []]
